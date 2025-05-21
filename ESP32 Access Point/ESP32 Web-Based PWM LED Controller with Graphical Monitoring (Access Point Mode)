@@ -1,0 +1,94 @@
+# ESP32 Web-Based PWM LED Controller with Real-Time Graphs
+
+This project implements a self-contained web server on the ESP32-WROOM-32 module, enabling real-time control and visualization of an LED's brightness using PWM (Pulse Width Modulation). It runs in **Wi-Fi Access Point mode**, so no external Wi-Fi is needed.
+
+---
+
+## 🚀 Features
+
+- ✅ **Access Point Mode**: ESP32 creates its own Wi-Fi network.
+- ✅ **Web-Based PWM Control**: Adjust LED brightness from 0–100% via slider.
+- ✅ **Real-Time Graphs** (Chart.js):
+  - Brightness percentage
+  - Estimated voltage
+  - PWM duty cycle
+  - Expandable to more charts (up to 6+)
+- ✅ **Live JavaScript Updates**: Graphs update dynamically as you move the slider.
+- ✅ **Historical Logging**:
+  - Tracks recent slider values with timestamps.
+  - Exposed via `/history` endpoint.
+
+---
+
+## 📡 How It Works
+
+1. ESP32 starts in **softAP** mode with a custom SSID and password.
+2. The user connects to the ESP32’s Wi-Fi network and accesses the hosted web page.
+3. A slider in the web UI sends brightness values to the ESP32 via a `/set?value=XX` endpoint.
+4. The ESP32:
+   - Sets the PWM duty cycle using the LEDC peripheral.
+   - Logs the brightness and timestamp.
+5. JavaScript in the browser updates multiple charts in real-time using **Chart.js**.
+
+---
+
+## 🛠️ Technical Details
+
+| Component     | Description                              |
+|---------------|------------------------------------------|
+| **ESP-IDF**   | ESP32 development framework              |
+| **LEDC PWM**  | 13-bit PWM on GPIO 2 for LED dimming     |
+| **HTTP Server** | `esp_http_server` handles `/`, `/set`, and `/history` |
+| **Chart.js**  | Used on the client side for graph rendering |
+| **FreeRTOS**  | RTOS powering tasks under the hood       |
+| **Memory**    | Dynamic allocation (`malloc`) used to handle large HTML responses (up to 8 KB)
+
+---
+
+## 🖥️ Web Interface
+
+- **Slider** (0–100%) controls LED brightness
+- **Charts**:
+  - Brightness % (0–100)
+  - Estimated voltage (0–3.3V)
+  - PWM duty (0–8191)
+  - Expandable to more (e.g., update rate, change delta)
+
+---
+
+## 📁 Endpoints
+
+| Endpoint     | Method | Description                              |
+|--------------|--------|------------------------------------------|
+| `/`          | GET    | Serves HTML page with slider and graphs  |
+| `/set?value=XX` | GET    | Updates PWM duty cycle based on value   |
+| `/history`   | GET    | Returns JSON log of previous slider changes |
+
+---
+
+## 💡 Future Enhancements
+
+- 📊 Plot `/history` data in long-term charts
+- 💾 Store logs in flash (NVS/SPIFFS)
+- 🧠 Add other sensor/telemetry graphs
+- 🔧 Serve static files (JS/CSS) from internal flash
+- 📤 Export logs as CSV/JSON
+
+---
+
+## 🧪 Memory Tips
+
+- Use `malloc(8192)` or higher for large HTML responses (6+ charts).
+- Monitor heap with `esp_get_free_heap_size()` to ensure stability.
+
+---
+
+## 📷 Screenshots
+
+_You can include screenshots here of your web UI with the graphs._
+
+---
+
+## 📜 License
+
+This project is released under the Public Domain (or CC0). No warranty implied.
